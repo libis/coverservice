@@ -3,6 +3,7 @@ require 'lib/cover_service/error'
 require 'jwt'
 require 'open-uri'
 require 'iso8601'
+require 'rmagick'
 
 module Sinatra
   module MainHelper
@@ -90,6 +91,54 @@ module Sinatra
 
     private
     
+    def save_org_cover (cover_uri, tmpfile)
+      begin
+        unless cover_uri.is_a?(URI)
+          begin
+            cover_uri = URI( cover_uri )
+          rescue URI::InvalidURIError
+            raise CoverService::Error::BadRequest, make_message("Invalid URI #{cover_uri}")
+          end
+        end
+        
+        case cover_uri.scheme
+        when 'http'
+          # Not jet implemented
+        when 'https'
+          # Not jet implemented
+        when 'file'
+          file_name = "#{cover_uri.host}#{cover_uri.path}" 
+
+          file_name_absolute_path = File.absolute_path(file_name)
+          file_directory = File.dirname(file_name_absolute_path)
+          org_directory = File.join(file_directory, "org")
+
+          org_file = File.basename(file_name, File.extname(file_name))
+          org_file = "#{org_file}_#{Time.now.strftime("%Y%m%d%H%M%S")}#{File.extname(file_name)}"
+          org_file = File.join(org_directory, org_file)
+
+          unless File.directory?(org_directory)
+            FileUtils.mkdir_p(org_directory)
+          end
+
+          cp(tmpfile.path, org_file)
+
+        when /amqp/
+          if cover_uri.scheme =~ /^rpc/
+            # Not jet implemented
+          else
+            # Not jet implemented
+          end
+        else
+          raise "Do not know how to process #{source}"
+        end
+
+
+      rescue StandardError => e
+        raise CoverService::Error::InternalServerError, make_message(e.message)
+      end
+    end
+
     def save_cover (cover_uri, tmpfile)
       begin
         unless cover_uri.is_a?(URI)
@@ -115,12 +164,21 @@ module Sinatra
             FileUtils.mkdir_p(file_directory)
           end
 
-          # TODO ?????
-          # check if the cover already exists
-          # if it exists, make a backup of the existing cover ?????
-
           cp(tmpfile.path, file_name)
 
+          new_file = File.basename(file_name, File.extname(file_name))
+          # TEST new_file = "#{new_file}_#{DataCollector::ConfigFile[:cover_dimentions]}.#{DataCollector::ConfigFile[:cover_extention_format]}"
+          new_file = "#{new_file}.#{DataCollector::ConfigFile[:cover_extention_format]}"
+          new_file = File.join(file_directory, new_file)
+
+          image = Magick::Image.read(file_name).first
+          image.change_geometry!(DataCollector::ConfigFile[:cover_dimentions]) { |cols, rows, img|
+            newimg = img.resize(cols, rows)
+            newimg.write(new_file)
+          }
+
+          File.delete(file_name)
+          
         when /amqp/
           if cover_uri.scheme =~ /^rpc/
             # Not jet implemented
@@ -130,7 +188,9 @@ module Sinatra
         else
           raise "Do not know how to process #{source}"
         end
-    
+        
+        return File.basename(new_file)
+
       rescue StandardError => e
         raise CoverService::Error::InternalServerError, make_message(e.message)
       end
@@ -159,10 +219,6 @@ module Sinatra
           file_name_absolute_path = File.absolute_path(file_name)
           file_directory = File.dirname(file_name_absolute_path)
   
-          pp "===================> file_name_absolute_path :#{file_name_absolute_path}"
-          pp "===================> file_name :#{file_name}"
-          pp "===================> file_directory :#{file_directory}"
-
           unless File.directory?(file_directory)
             FileUtils.mkdir_p(file_directory)
           end

@@ -1,6 +1,7 @@
 services:
   covers:
     #image: registry.docker.libis.be/libis/covers:20240916.1
+    # image: liconvert bis/covers:beta
     build: ./
     restart: unless-stopped
     ports:

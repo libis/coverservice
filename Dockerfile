@@ -1,6 +1,7 @@
 FROM ruby:3.4.2-slim-bookworm
 ARG VERSION=$VERSION
-RUN addgroup app --gid 10000 && adduser app --home /app --uid 10000 --ingroup app && apt -y update && apt -y install build-essential bash unzip vim libaio1 libaio-dev libyaml-dev && apt -y clean
+RUN addgroup app --gid 10000 && adduser app --home /app --uid 10000 --ingroup app && apt -y update && apt -y install build-essential bash unzip vim libaio1 libaio-dev libyaml-dev imagemagick libmagickcore-dev libmagickwand-dev && apt -y clean
+
 USER app:app
 WORKDIR /app
 

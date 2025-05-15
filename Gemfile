@@ -14,3 +14,4 @@ gem 'data_collector', '0.60'
 gem 'iso8601'
 gem 'http-accept'
 gem "mustache", "~> 1.0"
+gem "rmagick", "6.0.1"

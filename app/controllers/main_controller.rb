@@ -116,12 +116,12 @@ class MainController < GenericController
     end
     
     
-    pp "=========================================================================="
-    pp token_params
-    pp token_params[:user]
-    pp token_params[:inst_code]
-    pp "#{token_params[:tenant_code]} == #{params[:tenant]}_ADMIN"
-    pp "=========================================================================="
+    # pp "=========================================================================="
+    # pp token_params
+    # pp token_params[:user]
+    # pp token_params[:inst_code]
+    # pp "#{token_params[:tenant_code]} == #{params[:tenant]}_ADMIN"
+    # pp "=========================================================================="
 
     raise CoverService::Error::NotFound, make_message('Invalid institution: '+ institution_code) unless Institution.exists?(institution_code)
 
@@ -277,8 +277,11 @@ class MainController < GenericController
 
     tenant_cover_path, institution_cover_path = substitute_paths(storage_uri, params, cover_name) 
 
-    save_cover(tenant_cover_path, tmpfile)
-    save_cover(institution_cover_path, tmpfile)
+    save_org_cover(institution_cover_path, tmpfile)
+
+    cover_name = save_cover(tenant_cover_path, tmpfile)
+    cover_name = save_cover(institution_cover_path, tmpfile)
+
 
     # TODO: 
     # create cover with other dimensions
