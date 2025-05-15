@@ -1,0 +1,24 @@
+<style>
+    code.HTTP.language-HTTP, code.JSON.language-JSON {
+        background-color: #eeeeee;
+        padding: 10px;
+        display: block;
+    }
+</style>
+<h1>Cover Service: v<%= version %></h1>
+<h3>Available Tenants</h3>
+<ul>
+  <% tenants.each do |tenant| %>
+  <li><%= tenant.name %> <a href="/<%= DataCollector::ConfigFile[:endpoint] %><%=tenant.code%>">(<%= tenant.code %></a>)</li>
+  <% end %>
+</ul>
+<div>
+  <script>
+      function mdtohtml(event) {
+          let converter = new showdown.Converter();
+          converter.setOption('tables', true);
+          event.detail.serverResponse = converter.makeHtml(event.detail.serverResponse);
+      }
+  </script>
+  <div hx-get="/<%= DataCollector::ConfigFile[:endpoint] %>help.md" hx-trigger="load, htmx:beforeSwap[mdtohtml(event)]"></div>
+</div>

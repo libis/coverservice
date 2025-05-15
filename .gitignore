@@ -1,0 +1,15 @@
+.idea
+.env
+misc/*
+Gemfile.lock
+.DS_Store
+config.tgz
+config/config.yml
+config/db/initial.sql
+thumbnails/*
+/.vs
+*.pid
+*.sqlite
+*test*
+notes.txt
+config/db/covers.sqlite*

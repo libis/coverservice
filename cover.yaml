@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: Cover
+  description: API description for the 'Cover' service
+  version: 1.0.0
+servers:
+  - url: 'http://127.0.0.1:9292/cover'
+security:
+  - BearerAuth: [write]
+paths:
+  /:
+    get:
+      summary: return list of tenants and help
+      security: []
+      responses:
+        '200':
+          description: Service lists tenants and help
+          content:
+            application/json:
+              example: [
+                {
+                  "name": "DEMO Network",
+                  "code": "32DEMO",
+                  "institutions": [
+                    {
+                      "name": "DEMo institution",
+                      "code": "32DEMO_DEMO"
+                    }
+                  ]
+                }
+              ]
+            text/html:
+              example:
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+  /{tenant}:
+    get:
+      summary: list tenant institutions
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/tenantParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/200OK'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500Error'
+    post:
+
+  /{tenant}/{institution}:
+    get:
+      summary: list institution libraries
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/tenantParam'
+        - $ref: '#/components/parameters/institutionParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/200OK'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500Error'
+
+components:
+  parameters:
+    tenantParam:
+      name: tenant
+      in: path
+      description: The Alma tenant id
+      required: true
+      schema:
+        type: string
+        example: 32DEMO
+
+    institutionParam:
+       name: institution
+       in: path
+       description: The Alma institution id
+       required: true
+       schema:
+         type: string
+         example: 32DEMO_DEMO
+
+  responses:
+    200OK:
+      description: ok
+      content:
+        application/json:
+          example:
+    401NotAllowed:
+      description: not allowed
+      content:
+        application/json:
+          example:
+    404NotFound:
+      description: not found
+      content:
+        application/json:
+          example:
+    500Error:
+      description: error
+      content:
+        application/json:
+          example:

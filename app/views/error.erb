@@ -1,0 +1,13 @@
+<% if message[:body].nil? || message[:body].empty? || message[:body].eql?('error: ') %>
+  <h1>I'm puzzled too! May I suggest to take a look at the <strong><a href='/<%= DataCollector::ConfigFile[:endpoint] %>'>help</a></strong> page...</h1>
+  <% else %>
+<h1><%= message[:body] %></h1>
+<% end %>
+<% if message.key?(:status) %>
+  <% case message[:status] when 404 %>
+    <h2>Looks like it is not there</h2>
+  <% else %>
+    <h2>General Error</h2>
+  <% end %>
+<% end %>
+

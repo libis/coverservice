@@ -1,0 +1,20 @@
+<h1>Institutions</h1>
+  <%= institution.name %> [<%= institution.code %>]
+
+<hr>
+===> 
+/<%= DataCollector::ConfigFile[:endpoint] %>/<%= tenant %>/<%= institution.code %>
+
+<hr>
+  <form action="/<%= DataCollector::ConfigFile[:endpoint] %>/<%= tenant %>/<%= institution.code %>" method="post"  enctype="multipart/form-data">
+    <input type="text" name="code" placeholder="Code">
+    <select name="type" id="type">
+      <option value="mmsid">mssid</option>
+      <option value="isbn">isbn</option>
+      <option value="issn">issn</option>
+    </select>
+
+    <input type="file" name="cover" placeholder="cover">
+    <input type="submit" value="Add">
+
+  </form>

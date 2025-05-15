@@ -1,0 +1,1 @@
+DELETE FROM "audit" WHERE execution_time < date('now', '-1 year');

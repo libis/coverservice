@@ -1,0 +1,22 @@
+
+
+<h1>Audit for <%= institution_code %></h1>
+
+<table style="border:1px solid black;margin-left:auto;margin-right:auto;">
+  <tr> 
+    <th> Execution Time </th> 
+    <th> Method </th> 
+    <th> Cover </th> 
+    <th> User </th> 
+</tr>
+  <% audit_rows.each do |audit| %>
+    <tr> 
+        <td> <%= audit[:execution_time] %> </td> 
+        <td> <%= audit[:method] %> </td> 
+        <td> <%= audit[:cover] %> </td> 
+        <td> <%= audit[:user_id] %> </td> 
+    </tr>
+  <% end %>
+</table>
+
+<hr>

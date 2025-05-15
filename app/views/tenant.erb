@@ -1,0 +1,9 @@
+<h1><%=tenant.name %></h1>
+<h2>Institutions</h2>
+  <ul>
+  <% tenant.institutions.each do |institution| %>
+    <li>
+      <%= institution.name %>(<a href="/<%= DataCollector::ConfigFile[:endpoint] %><%=tenant.code%>/<%= institution.code %>"><%= institution.code %></a>)
+    </li>
+  <% end %>
+  </ul>

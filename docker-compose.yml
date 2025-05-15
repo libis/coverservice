@@ -1,0 +1,26 @@
+services:
+  covers:
+    #image: registry.docker.libis.be/libis/covers:20240916.1
+    build: ./
+    restart: unless-stopped
+    ports:
+      - "11092:9292"
+    environment:
+      - OH_VERSION=20250303.1
+    container_name: covers
+    volumes:
+      #- ./volumes/covers/config:/app/config
+      - ./config:/app/config
+      - ./app:/app/app
+      - ./public:/app/public
+      - ../../volumes/covers/:/covers/
+    networks:
+      - public   
+    #extra_hosts:
+    #  - "host.docker.internal:host-gateway"       
+
+networks:
+  public:
+    driver: bridge
+    ipam:
+     driver: default
