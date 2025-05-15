@@ -12,6 +12,7 @@ services:
       #- ./volumes/covers/config:/app/config
       - ./config:/app/config
       - ./app:/app/app
+      - ./db:/app/db
       - ./public:/app/public
       - ../../volumes/covers/:/covers/
     networks:

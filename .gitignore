@@ -12,4 +12,4 @@ thumbnails/*
 *.sqlite
 *test*
 notes.txt
-config/db/covers.sqlite*
+./db/covers.sqlite*

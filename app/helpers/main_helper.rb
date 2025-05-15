@@ -16,8 +16,6 @@ module Sinatra
       if token_params[:user].nil?
         token_params[:user] = token_params[:sub]
       end
-      pp "token token token token"
-      pp token_params
       if token_params[:inst_code] != institution_code && token_params[:inst_code] != 'DEFAULT'
         raise CoverService::Error::NotAllowed, make_message('Authorization error institution code: '+ institution_code)
       end
