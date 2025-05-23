@@ -87,10 +87,12 @@ cover : [image file]
 type : mmmsid    
 code : [alma_mmmsid]  
 
-The originally uploaded image file will be stored in the following directory structure: \<tenant>/\<institution>/org/.
-The image will then be resized and reformatted by an 'external' service.
-Check image_converter_service, default_cover_dimensions, and cover_extension_format settings in config.yml.
-
+The originally uploaded image file will be stored in the following directory structure: \<tenant>/\<institution>/org/.  
+The image will then be resized and reformatted by an 'external' service. 
+#### config.yml settings for image conversion service:
+- **image_converter_service**: The URL where the image conversion service can be accessed.
+- **default_cover_dimensions**: The maximum width and height for the newly generated image, while maintaining the original aspect ratio.
+- **cover_extension_format**: The file extension that defines the format of the newly generated image.
 ### Delete cover
 Delete request with type and code as form-data in the reques body
 ```bash
