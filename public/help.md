@@ -28,9 +28,10 @@ Authorization: Bearer <your-jwt-token>
 ---
 
 ## Configuration
+
 apikeys and tenent-institution structure are configured with ./config/db/initial.sql  
 Other configuration parameters are set in ./config/config.yml
----
+
 
 ## Cover Service
 
@@ -86,13 +87,16 @@ cover : [image file]
 type : mmmsid    
 code : [alma_mmmsid]  
 
+The originally uploaded image file will be stored in the following directory structure: <tenant>/<institution>/org/.
+The image will then be resized and reformatted by an 'external' service.
+Check image_converter_service, default_cover_dimensions, and cover_extension_format settings in config.yml.
 
 ### Delete cover
 Delete request with type and code as form-data in the reques body
 ```bash
-DELETE https://example.com/[sub_path]/:tenant/:institution 
+DELETE https://example.com/[sub_path]/:tenant/:institution?code=<alma_mmmsid>&type=<type> 
 ```
-***form-data***  
+***query params***  
 type : mmmsid   
 code : [alma_mmmsid]
 
