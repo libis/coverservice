@@ -87,7 +87,7 @@ cover : [image file]
 type : mmmsid    
 code : [alma_mmmsid]  
 
-The originally uploaded image file will be stored in the following directory structure: <tenant>/<institution>/org/.
+The originally uploaded image file will be stored in the following directory structure: \<tenant>/\<institution>/org/.
 The image will then be resized and reformatted by an 'external' service.
 Check image_converter_service, default_cover_dimensions, and cover_extension_format settings in config.yml.
 
