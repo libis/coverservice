@@ -277,11 +277,12 @@ class MainController < GenericController
 
     tenant_cover_path, institution_cover_path = substitute_paths(storage_uri, params, cover_name) 
 
-    save_org_cover(institution_cover_path, tmpfile)
+    org_cover_uri = save_org_cover(institution_cover_path, tmpfile)
 
-    cover_name = save_cover(tenant_cover_path, tmpfile)
-    cover_name = save_cover(institution_cover_path, tmpfile)
+    converted_cover = convert_cover(cover_source_file: org_cover_uri)
 
+    cover_name = save_cover(cover_target_uri: tenant_cover_path, cover: converted_cover)
+    cover_name = save_cover(cover_target_uri: institution_cover_path, cover: converted_cover)
 
     # TODO: 
     # create cover with other dimensions
@@ -332,7 +333,6 @@ class MainController < GenericController
     # Todo : check fileextension and file size
 
     raise CoverService::Error::NotFound, make_message('Invalid institution: '+ institution_code) unless Institution.exists?(institution_code)
-    raise CoverService::Error::UnprocessableContent, make_message('cover file is missing')  unless params[:cover]
 
     unless ["mmsid", "isbn", "issn"].include? params[:type]
       raise CoverService::Error::BadRequest, "Unsuperported type #{params[:type]}"
@@ -342,7 +342,7 @@ class MainController < GenericController
       raise CoverService::Error::BadRequest, "code is required!"
     end
 
-    cover_ext = "jpg"
+    cover_ext = DataCollector::ConfigFile[:cover_extention_format]
     cover_name = "#{params[:code]}.#{ cover_ext }"
 
     storage_uri = DataCollector::ConfigFile[:cover_storage]

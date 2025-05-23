@@ -34,6 +34,11 @@ class GenericController < Sinatra::Base
     @media_type = media_types.first
     content_type @media_type
   end
+  
+  options "*" do
+    headers["Allow"] = 'HEAD,GET,PUT,POST,DELETE,OPTIONS'
+    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, X-LB-Forwarded-For, X-Forwarded-For'
+  end
 
   error do
     body =  JSON.parse(env['sinatra.error'].message) rescue {message: env['sinatra.error'].message}

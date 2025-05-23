@@ -3,7 +3,6 @@ require 'lib/cover_service/error'
 require 'jwt'
 require 'open-uri'
 require 'iso8601'
-require 'rmagick'
 
 module Sinatra
   module MainHelper
@@ -101,6 +100,8 @@ module Sinatra
           end
         end
         
+        logger.info("Save original to #{cover_uri}")
+
         case cover_uri.scheme
         when 'http'
           # Not jet implemented
@@ -123,6 +124,7 @@ module Sinatra
 
           cp(tmpfile.path, org_file)
 
+          return org_file
         when /amqp/
           if cover_uri.scheme =~ /^rpc/
             # Not jet implemented
@@ -133,29 +135,30 @@ module Sinatra
           raise "Do not know how to process #{source}"
         end
 
-
       rescue StandardError => e
         raise CoverService::Error::InternalServerError, make_message(e.message)
       end
     end
 
-    def save_cover (cover_uri, tmpfile)
+    def save_cover (cover_target_uri: nil, cover: nil)
       begin
-        unless cover_uri.is_a?(URI)
+        unless cover_target_uri.is_a?(URI)
           begin
-            cover_uri = URI( cover_uri )
+            cover_target_uri = URI( cover_target_uri )
           rescue URI::InvalidURIError
-            raise CoverService::Error::BadRequest, make_message("Invalid URI #{cover_uri}")
+            raise CoverService::Error::BadRequest, make_message("Invalid URI #{cover_target_uri}")
           end
         end
 
-        case cover_uri.scheme
+        logger.info("Save cover to #{cover_target_uri}")
+
+        case cover_target_uri.scheme
         when 'http'
           # Not jet implemented
         when 'https'
           # Not jet implemented
         when 'file'
-          file_name = "#{cover_uri.host}#{cover_uri.path}" 
+          file_name = "#{cover_target_uri.host}#{cover_target_uri.path}" 
 
           file_name_absolute_path = File.absolute_path(file_name)
           file_directory = File.dirname(file_name_absolute_path)
@@ -164,20 +167,14 @@ module Sinatra
             FileUtils.mkdir_p(file_directory)
           end
 
-          cp(tmpfile.path, file_name)
-
           new_file = File.basename(file_name, File.extname(file_name))
           # TEST new_file = "#{new_file}_#{DataCollector::ConfigFile[:cover_dimentions]}.#{DataCollector::ConfigFile[:cover_extention_format]}"
           new_file = "#{new_file}.#{DataCollector::ConfigFile[:cover_extention_format]}"
           new_file = File.join(file_directory, new_file)
 
-          image = Magick::Image.read(file_name).first
-          image.change_geometry!(DataCollector::ConfigFile[:cover_dimentions]) { |cols, rows, img|
-            newimg = img.resize(cols, rows)
-            newimg.write(new_file)
-          }
-
-          File.delete(file_name)
+          logger.info("Save cover to #{new_file}")
+          
+          File.open(new_file, "w") { |f| f.puts cover }
           
         when /amqp/
           if cover_uri.scheme =~ /^rpc/
@@ -197,7 +194,35 @@ module Sinatra
       
     end
 
-    
+    def convert_cover(cover_source_file: nil)
+      begin
+        if cover_source_file.nil?
+          raise CoverService::Error::BadRequest, make_message("No cover source file")
+        end
+        if self.config[:image_converter_service].nil?
+          raise CoverService::Error::BadRequest, make_message("No image converter service configured: check config.yml")
+        end
+        if self.config[:default_cover_dimentions].nil?
+          raise CoverService::Error::BadRequest, make_message("No default cover dimentions configured: check config.yml")
+        end
+
+        uri = cover_source_file.gsub("/covers","local://")
+        cover_convertor_uri = self.config[:image_converter_service].to_s.gsub('{{default_cover_dimentions}}', self.config[:default_cover_dimentions].gsub(/x/,':') ) 
+        cover_convertor_uri = cover_convertor_uri.gsub(/{{uri}}/,  uri )
+
+        response = HTTP.get( cover_convertor_uri )
+
+        unless response.status.success?
+          raise CoverService::Error::BadRequest, make_message("Error converting cover #{cover_convertor_uri}")
+        end
+
+        response.body
+
+      rescue StandardError => e
+        raise CoverService::Error::InternalServerError, make_message(e.message)
+      end
+    end
+
     def delete_cover (cover_uri)
       begin
         unless cover_uri.is_a?(URI)
@@ -236,7 +261,7 @@ module Sinatra
             pp "move to delete folder with timestamp !!"
             FileUtils.mv(file_name, delete_file)
           else
-            raise "cover #{file_name_absolute_path} does not exists on disk"
+            raise CoverService::Error::NotFound, "cover #{file_name_absolute_path} does not exists on disk"
           end
 
         when /amqp/
@@ -248,13 +273,15 @@ module Sinatra
         else
           raise "Do not know how to process #{source}"
         end
+      rescue  CoverService::Error::NotFound => e
+        raise CoverService::Error::NotFound, make_message(e.message)
       rescue StandardError => e
         raise CoverService::Error::InternalServerError, make_message(e.message)
       end
       
     end
 
-    def  substitute_paths(storage_uri, params, cover_name) 
+    def substitute_paths(storage_uri, params, cover_name) 
       tenant_cover_path =  storage_uri
                         .gsub(/{{tenant}}/, params[:tenant].upcase )
                         .gsub(/{{provider}}/, params[:tenant].upcase )
