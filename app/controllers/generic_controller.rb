@@ -37,7 +37,7 @@ class GenericController < Sinatra::Base
   
   options "*" do
     headers["Allow"] = 'HEAD,GET,PUT,POST,DELETE,OPTIONS'
-    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, X-LB-Forwarded-For, X-Forwarded-For'
+    headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept, X-LB-Forwarded-For, X-Forwarded-For, Authorization'
   end
 
   error do
