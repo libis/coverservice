@@ -28,10 +28,25 @@ Authorization: Bearer <your-jwt-token>
 ---
 
 ## Configuration
+### ./config/db/initial.sql
+The initial sql creates an sql database
+Tables created in this database are
+- tenants [id, name, code, key]
+- institutions [id, name, code, tenant_id, key]
 
-apikeys and tenent-institution structure are configured with ./config/db/initial.sql  
-Other configuration parameters are set in ./config/config.yml
+Every institution will belongs to a tenant (instutions.tenant_id => tenants.id)
 
+### ./config/config.yml
+- **cache**: Directory path for cached files / Cache expiration time
+- **endpoint**: Part of the URL to access the service 
+- **tenant**: Default tenant if not set in URI
+- **:region**: Region code
+- **db**:  Path to the SQLite database used for storing metadata (e.g., ./db/covers.sqlite)  
+- **cover_storage**: Template URI for storing cover images locally. 
+- **image_converter_service**: URL template for image converting service.
+- **default_cover_dimentions**:  Default dimensions for converted cover images (e.g., 480x480)
+- **cover_extention_format**: File format for saved cover images (e.g., webp)
+- **cover_providers**: Defines external services used to resolvecover images
 
 ## Cover Service
 

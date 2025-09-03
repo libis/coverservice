@@ -1,0 +1,15 @@
+:cache:
+  :dir: './cache'
+  :expires: 30
+:endpoint: 'covers/'
+:tenant: 32DEMO
+:region: eu
+:db: ./db/covers.sqlite
+:cover_storage: "file:///covers/{{tenant}}/{{provider}}/{{type}}/thumbnails"
+:image_converter_service: "https://example.com/imageprocessor?dim={{default_cover_dimentions}}&img_source={{uri}}"
+:default_cover_dimentions: "480x480"
+:cover_extention_format: "webp"
+:cover_providers: 
+  CVR_:
+    url: "https://example.com/cover_resolver"
+    supported_id_types: ["mms","isbn"]
