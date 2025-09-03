@@ -29,12 +29,13 @@ Authorization: Bearer <your-jwt-token>
 
 ## Configuration
 ### ./config/db/initial.sql
-The initial sql creates an sql database
+The initial SQL creates an SQL database.
 Tables created in this database are
+
 - tenants [id, name, code, key]
 - institutions [id, name, code, tenant_id, key]
 
-Every institution will belongs to a tenant (instutions.tenant_id => tenants.id)
+Each institution is linked to a tenant (instutions.tenant_id => tenants.id)
 
 ### ./config/config.yml
 - **cache**: Directory path for cached files / Cache expiration time
@@ -46,7 +47,7 @@ Every institution will belongs to a tenant (instutions.tenant_id => tenants.id)
 - **image_converter_service**: URL template for image converting service.
 - **default_cover_dimentions**:  Default dimensions for converted cover images (e.g., 480x480)
 - **cover_extention_format**: File format for saved cover images (e.g., webp)
-- **cover_providers**: Defines external services used to resolvecover images
+- **cover_providers**: Defines external services used to resolve cover images
 
 ## Cover Service
 
