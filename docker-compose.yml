@@ -15,11 +15,25 @@ services:
       - ./app:/app/app
       - ./db:/app/db
       - ./public:/app/public
-      - ../../volumes/covers/:/covers/
+      - ../../volumes/test_covers/:/covers/:rwx
+      - ../../volumes/imgproxy/:/imgproxy/:rwx      
     networks:
       - public   
     #extra_hosts:
     #  - "host.docker.internal:host-gateway"       
+
+  imgproxy:
+    #image: ghcr.io/imgproxy/imgproxy:latest
+    image: ghcr.io/imgproxy/imgproxy:v3.28.0
+    ports:
+      - 10029:8080
+    volumes:
+    - ../../volumes/imgproxy/:/imgproxy/:rwx
+    environment:
+      - IMGPROXY_LOCAL_FILESYSTEM_ROOT=/imgproxy
+      - IMGPROXY_KEY=636F76657273657276696365
+      - IMGPROXY_SALT=7468756D626E61696C
+      - IMGPROXY_TRUSTED_SIGNATURES=uNVrt00WzgV8v6rzj+MsVvWLS+gMIeySbZyK0lQNPMI=
 
 networks:
   public:

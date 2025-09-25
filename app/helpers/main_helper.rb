@@ -205,16 +205,38 @@ module Sinatra
         if self.config[:default_cover_dimentions].nil?
           raise CoverService::Error::BadRequest, make_message("No default cover dimentions configured: check config.yml")
         end
+        if self.config[:converter_storage].nil?
+          raise CoverService::Error::BadRequest, make_message("No converter_storage configured: check config.yml example: file:///imgproxy")
+        end
 
-        uri = cover_source_file.gsub("/covers","local://")
+        converter_storage_folder = self.config[:converter_storage].gsub("file:///","/")
+        
+        basename = File.basename(cover_source_file, ".*") 
+        extname  = File.extname(cover_source_file)
+        p = Process.uid
+        filename ="#{basename}_#{p}#{extname}"
+
+        converter_file = File.join(converter_storage_folder,filename )
+
+        FileUtils.mkdir_p(File.dirname(converter_file))
+        logger.info("Copy to #{converter_file} for conversion")
+        FileUtils.cp(cover_source_file, converter_file)
+        FileUtils.chmod 0755, converter_file, verbose: true
+
+        uri = converter_file.gsub("/imgproxy","local://")
+        
         cover_convertor_uri = self.config[:image_converter_service].to_s.gsub('{{default_cover_dimentions}}', self.config[:default_cover_dimentions].gsub(/x/,':') ) 
         cover_convertor_uri = cover_convertor_uri.gsub(/{{uri}}/,  uri )
 
+        pp cover_convertor_uri 
         response = HTTP.get( cover_convertor_uri )
-
+        
         unless response.status.success?
           raise CoverService::Error::BadRequest, make_message("Error converting cover #{cover_convertor_uri}")
         end
+        
+        logger.info("Remove #{converter_file} after conversion")
+        FileUtils.rm( converter_file )
 
         response.body
 

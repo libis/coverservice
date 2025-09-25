@@ -29,7 +29,7 @@ Authorization: Bearer <your-jwt-token>
 
 ## Configuration
 ### ./config/db/initial.sql
-The initial SQL creates an SQL database.
+The initial SQL creates an SQL database.  
 Tables created in this database are
 
 - tenants [id, name, code, key]
@@ -41,10 +41,11 @@ Each institution is linked to a tenant (instutions.tenant_id => tenants.id)
 - **cache**: Directory path for cached files / Cache expiration time
 - **endpoint**: Part of the URL to access the service 
 - **tenant**: Default tenant if not set in URI
-- **:region**: Region code
+- **region**: Region code
 - **db**:  Path to the SQLite database used for storing metadata (e.g., ./db/covers.sqlite)  
 - **cover_storage**: Template URI for storing cover images locally. 
 - **image_converter_service**: URL template for image converting service.
+- **converter_storage**: Path to a shared folder accessible by both the app and the image converter service, used to store original images before conversion.
 - **default_cover_dimentions**:  Default dimensions for converted cover images (e.g., 480x480)
 - **cover_extention_format**: File format for saved cover images (e.g., webp)
 - **cover_providers**: Defines external services used to resolve cover images
